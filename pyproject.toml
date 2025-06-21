@@ -48,9 +48,9 @@ dev = [
 doggo = "doggo.cli:main"
 
 [project.urls]
-Homepage = "https://github.com/yourusername/doggo"
-Repository = "https://github.com/yourusername/doggo"
-Issues = "https://github.com/yourusername/doggo/issues"
+Homepage = "https://github.com/n0lan/doggo"
+Repository = "https://github.com/n0lan/doggo"
+Issues = "https://github.com/n0lan/doggo/issues"
 
 [tool.black]
 line-length = 88

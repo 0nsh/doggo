@@ -8,7 +8,7 @@ import openai
 
 from doggo.utils import scan_image_files, extract_file_metadata, validate_image_file
 from doggo.database import add_image_to_index, get_indexed_files
-from doggo.config import load_config
+from doggo.config import load_config, add_indexed_path, update_last_reindex
 
 
 def generate_image_description(image_path: Path) -> str:
@@ -161,6 +161,11 @@ def index_directory(directory: Path, dry_run: bool = False) -> Dict[str, Any]:
         except Exception as e:
             errors += 1
             errors_list.append(f"{image_path}: {str(e)}")
+    
+    # Update configuration if indexing was successful
+    if processed > 0:
+        add_indexed_path(directory)
+        update_last_reindex()
     
     return {
         "total_found": len(image_files),

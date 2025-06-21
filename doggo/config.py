@@ -3,6 +3,7 @@
 import json
 from pathlib import Path
 from typing import Dict, Any
+import datetime
 
 
 def get_config_dir() -> Path:
@@ -88,4 +89,26 @@ def get_config_summary() -> dict:
         "Indexed Paths": len(config.get("indexed_paths", [])),
         "Last Reindex": config.get("last_reindex") or "Never",
         "Version": config.get("version", "?")
-    } 
+    }
+
+
+def add_indexed_path(path: str) -> None:
+    """Add a path to the list of indexed paths in the config."""
+    config = load_config()
+    indexed_paths = config.get("indexed_paths", [])
+    
+    # Convert to string if it's a Path object
+    path_str = str(path)
+    
+    # Add path if not already in the list
+    if path_str not in indexed_paths:
+        indexed_paths.append(path_str)
+        config["indexed_paths"] = indexed_paths
+        save_config(config)
+
+
+def update_last_reindex() -> None:
+    """Update the last reindex timestamp in the config."""
+    config = load_config()
+    config["last_reindex"] = datetime.datetime.now().isoformat()
+    save_config(config) 
