@@ -53,6 +53,7 @@ def load_config() -> Dict[str, Any]:
 def save_config(config: Dict[str, Any]) -> None:
     """Save configuration to file."""
     config_file = get_config_file()
+    create_config_dir()  # Ensure directory exists
     with open(config_file, 'w') as f:
         json.dump(config, f, indent=2)
 
