@@ -25,7 +25,7 @@ powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
 
 ```bash
 # Clone the repository
-git clone https://github.com/n0lan/doggo.git
+git clone https://github.com/0nsh/doggo
 cd doggo
 
 # Create virtual environment and install dependencies
