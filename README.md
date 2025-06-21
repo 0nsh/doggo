@@ -10,6 +10,10 @@
     <img src="https://github.com/0nsh/doggo/actions/workflows/test.yaml/badge.svg" alt="Test">
 </a>
 
+<a href="https://pypi.org/project/doggo" target="_blank">
+    <img src="https://img.shields.io/pypi/v/doggo?color=%2334D058&label=pypi%20package" alt="Package version">
+</a>
+
 </p>
 <hr>
 
@@ -24,7 +28,7 @@ Doggo is a CLI tool that uses AI to help you search for images using natural lan
 
 ## Demo
 
-TO BE ADDED
+https://github.com/user-attachments/assets/568d7f3d-9ff6-4adb-89db-71455a174c46
 
 
 ## Usage
