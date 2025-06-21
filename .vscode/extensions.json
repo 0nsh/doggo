@@ -1,0 +1,6 @@
+{
+    "recommendations": [
+        "ms-python.debugpy",
+        "humao.rest-client"
+    ]
+}

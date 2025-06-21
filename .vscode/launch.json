@@ -1,0 +1,73 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug Doggo Index (Dry Run)",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/doggo/cli.py",
+            "args": [
+                "index",
+                "./local/images",
+                "--dry-run"
+            ],
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}"
+            },
+            "justMyCode": false,
+            "stopOnEntry": false
+        },
+        {
+            "name": "Debug Doggo Index (Real)",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/doggo/cli.py",
+            "args": [
+                "index",
+                "./local/images"
+            ],
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}"
+            },
+            "justMyCode": false,
+            "stopOnEntry": false
+        },
+        {
+            "name": "Debug Doggo Init",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/doggo/cli.py",
+            "args": [
+                "init"
+            ],
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}"
+            },
+            "justMyCode": false,
+            "stopOnEntry": false
+        },
+        {
+            "name": "Debug Doggo Config Show",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/doggo/cli.py",
+            "args": [
+                "config",
+                "show"
+            ],
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}"
+            },
+            "justMyCode": false,
+            "stopOnEntry": false
+        }
+    ]
+} 

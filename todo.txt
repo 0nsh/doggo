@@ -1,0 +1,7 @@
+- threshold for search
+- improved Prompt
+- multi-modal capability
+- Desktop App
+
+
+https://pypi.org/project/doggo/
