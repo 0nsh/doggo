@@ -7,7 +7,7 @@ import pytest
 from PIL import Image
 
 from doggo.indexer import (
-    generate_image_description,
+    generate_image_metadata,
     generate_embedding,
     process_single_image,
     index_directory
@@ -19,8 +19,8 @@ class TestAIIntegration:
     
     @patch('doggo.indexer.load_config')
     @patch('doggo.indexer.openai.OpenAI')
-    def test_generate_image_description(self, mock_openai, mock_load_config):
-        """Test image description generation."""
+    def test_generate_image_metadata(self, mock_openai, mock_load_config):
+        """Test image metadata generation."""
         # Mock config
         mock_load_config.return_value = {"openai_api_key": "sk-test123"}
         
@@ -29,7 +29,7 @@ class TestAIIntegration:
         mock_openai.return_value = mock_client
         
         mock_response = MagicMock()
-        mock_response.choices[0].message.content = "A beautiful sunset over the ocean"
+        mock_response.choices[0].message.content = '{"description": "A beautiful sunset over the ocean", "category": "landscape", "filename": "sunset_ocean"}'
         mock_client.chat.completions.create.return_value = mock_response
         
         # Create test image
@@ -39,29 +39,32 @@ class TestAIIntegration:
             image_path = Path(f.name)
         
         try:
-            description = generate_image_description(image_path)
-            assert description == "A beautiful sunset over the ocean"
+            metadata = generate_image_metadata(image_path)
+            assert metadata["description"] == "A beautiful sunset over the ocean"
+            assert metadata["category"] == "landscape"
+            assert metadata["filename"] == "sunset_ocean"
             
             # Verify API call
             mock_client.chat.completions.create.assert_called_once()
             call_args = mock_client.chat.completions.create.call_args
             
             assert call_args[1]["model"] == "gpt-4o"
-            assert call_args[1]["max_tokens"] == 150
+            assert call_args[1]["max_tokens"] == 200
+            assert call_args[1]["response_format"] == {"type": "json_object"}
             
             # Check message content
             messages = call_args[1]["messages"][0]["content"]
             assert len(messages) == 2
             assert messages[0]["type"] == "text"
-            assert "Describe this image" in messages[0]["text"]
+            assert "Analyze this image" in messages[0]["text"]
             assert messages[1]["type"] == "image_url"
         finally:
             image_path.unlink()
     
     @patch('doggo.indexer.load_config')
     @patch('doggo.indexer.openai.OpenAI')
-    def test_generate_image_description_no_api_key(self, mock_openai, mock_load_config):
-        """Test image description generation without API key."""
+    def test_generate_image_metadata_no_api_key(self, mock_openai, mock_load_config):
+        """Test image metadata generation without API key."""
         mock_load_config.return_value = {"openai_api_key": ""}
         
         with tempfile.NamedTemporaryFile(suffix='.jpg', delete=False) as f:
@@ -71,7 +74,7 @@ class TestAIIntegration:
         
         try:
             with pytest.raises(ValueError, match="OpenAI API key not configured"):
-                generate_image_description(image_path)
+                generate_image_metadata(image_path)
         finally:
             image_path.unlink()
     
@@ -106,18 +109,22 @@ class TestImageProcessing:
     
     @patch('doggo.indexer.validate_image_file')
     @patch('doggo.indexer.extract_file_metadata')
-    @patch('doggo.indexer.generate_image_description')
+    @patch('doggo.indexer.generate_image_metadata')
     @patch('doggo.indexer.generate_embedding')
-    def test_process_single_image(self, mock_embedding, mock_description, mock_metadata, mock_validate):
+    def test_process_single_image(self, mock_embedding, mock_metadata, mock_file_metadata, mock_validate):
         """Test processing a single image."""
         # Mock all dependencies
         mock_validate.return_value = True
-        mock_metadata.return_value = {
+        mock_file_metadata.return_value = {
             "file_hash": "test_hash_123",
             "file_path": "/test/image.jpg",
             "file_name": "image.jpg"
         }
-        mock_description.return_value = "A beautiful sunset"
+        mock_metadata.return_value = {
+            "description": "A beautiful sunset",
+            "category": "landscape",
+            "filename": "sunset_image"
+        }
         mock_embedding.return_value = [0.1, 0.2, 0.3]
         
         image_path = Path("/test/image.jpg")
@@ -130,8 +137,8 @@ class TestImageProcessing:
         
         # Verify calls
         mock_validate.assert_called_once_with(image_path)
+        mock_file_metadata.assert_called_once_with(image_path)
         mock_metadata.assert_called_once_with(image_path)
-        mock_description.assert_called_once_with(image_path)
         mock_embedding.assert_called_once_with("A beautiful sunset image.jpg")
     
     @patch('doggo.indexer.validate_image_file')
