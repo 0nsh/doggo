@@ -197,7 +197,7 @@ class TestCLIConfig:
             "OpenAI API Key": "sk-1234...cdef",
             "Indexed Paths": 2,
             "Last Reindex": "2024-01-01",
-            "Version": "0.1.0"
+            "Version": "0.2.0"
         }
         result = self.runner.invoke(main, ['config', 'show'])
         assert result.exit_code == 0
@@ -206,7 +206,7 @@ class TestCLIConfig:
         assert "Indexed Paths" in result.output
         assert "2" in result.output
         assert "2024-01-01" in result.output
-        assert "0.1.0" in result.output
+        assert "0.2.0" in result.output
     
     @patch('doggo.config.get_config_summary', side_effect=Exception("Config error"))
     def test_config_show_error(self, mock_summary):

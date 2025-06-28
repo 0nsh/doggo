@@ -78,7 +78,7 @@ class TestDefaultConfig:
         assert config["openai_api_key"] == ""
         assert config["indexed_paths"] == []
         assert config["last_reindex"] is None
-        assert config["version"] == "0.1.0"
+        assert config["version"] == "0.2.0"
     
     @patch('doggo.config.get_config_file')
     @patch('doggo.config.save_config')
@@ -122,7 +122,7 @@ class TestConfigFileOperations:
             "openai_api_key": "sk-test123",
             "indexed_paths": ["/path1", "/path2"],
             "last_reindex": "2023-01-01",
-            "version": "0.1.0"
+            "version": "0.2.0"
         }
         
         with patch('doggo.config.get_config_file') as mock_get_file:
@@ -153,7 +153,7 @@ class TestConfigFileOperations:
             "openai_api_key": "sk-test123",
             "indexed_paths": ["/path1"],
             "last_reindex": None,
-            "version": "0.1.0"
+            "version": "0.2.0"
         }
         
         with patch('doggo.config.get_config_file') as mock_get_file:
@@ -237,7 +237,7 @@ class TestAPIKey:
     
     def test_set_api_key_valid(self):
         with patch('doggo.config.save_config') as mock_save, \
-             patch('doggo.config.load_config', return_value={"openai_api_key": "", "indexed_paths": [], "last_reindex": None, "version": "0.1.0"}):
+             patch('doggo.config.load_config', return_value={"openai_api_key": "", "indexed_paths": [], "last_reindex": None, "version": "0.2.0"}):
             set_api_key("sk-1234567890abcdef")
             args = mock_save.call_args[0][0]
             assert args["openai_api_key"] == "sk-1234567890abcdef"
@@ -251,20 +251,20 @@ class TestAPIKey:
             "openai_api_key": "sk-1234567890abcdef",
             "indexed_paths": ["/a", "/b"],
             "last_reindex": "2024-01-01",
-            "version": "0.1.0"
+            "version": "0.2.0"
         }):
             summary = get_config_summary()
             assert summary["OpenAI API Key"].startswith("sk-123")
             assert summary["OpenAI API Key"].endswith("cdef")
             assert summary["Indexed Paths"] == 2
             assert summary["Last Reindex"] == "2024-01-01"
-            assert summary["Version"] == "0.1.0"
+            assert summary["Version"] == "0.2.0"
         # Test with no API key
         with patch('doggo.config.load_config', return_value={
             "openai_api_key": "",
             "indexed_paths": [],
             "last_reindex": None,
-            "version": "0.1.0"
+            "version": "0.2.0"
         }):
             summary = get_config_summary()
             assert summary["OpenAI API Key"] == "(not set)" 

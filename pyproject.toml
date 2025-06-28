@@ -1,6 +1,6 @@
 [project]
 name = "doggo"
-version = "0.1.0"
+version = "0.2.0"
 description = "Your loyal digital companion who finds files the way you think about them"
 readme = "README.md"
 requires-python = ">=3.11"

@@ -28,7 +28,7 @@ def get_default_config() -> Dict[str, Any]:
         "openai_api_key": "",
         "indexed_paths": [],
         "last_reindex": None,
-        "version": "0.1.0"
+        "version": "0.2.0"
     }
 
 
