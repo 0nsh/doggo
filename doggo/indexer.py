@@ -11,8 +11,8 @@ from doggo.database import add_image_to_index, get_indexed_files
 from doggo.config import load_config, add_indexed_path, update_last_reindex
 
 
-def generate_image_description(image_path: Path) -> str:
-    """Generate AI description for an image using OpenAI Vision API."""
+def generate_image_metadata(image_path: Path) -> Dict[str, str]:
+    """Generate AI description, category, and filename for an image using a single OpenAI call."""
     config = load_config()
     api_key = config.get("openai_api_key")
     
@@ -42,16 +42,22 @@ def generate_image_description(image_path: Path) -> str:
         # Encode as base64
         base64_image = base64.b64encode(img_bytes.getvalue()).decode('utf-8')
     
-    # Generate description
+    # Generate metadata with structured output
     response = client.chat.completions.create(
         model="gpt-4o",
+        response_format={"type": "json_object"},
         messages=[
             {
                 "role": "user",
                 "content": [
                     {
                         "type": "text",
-                        "text": "Describe this image in detail for search purposes. Focus on visual elements, objects, colors, composition, and any text or symbols visible. Be specific and descriptive."
+                        "text": """Analyze this image and return a JSON object with exactly these three fields:
+- "description": A detailed description for search purposes (focus on visual elements, objects, colors, composition)
+- "category": A single-word or short phrase category (e.g., "flower", "dog", "landscape")
+- "filename": A descriptive filename with 2-8 words, filesystem-safe (use underscores, no special chars)
+
+Return a valid JSON object with these exact field names."""
                     },
                     {
                         "type": "image_url",
@@ -62,10 +68,26 @@ def generate_image_description(image_path: Path) -> str:
                 ]
             }
         ],
-        max_tokens=150
+        max_tokens=200
     )
     
-    return response.choices[0].message.content.strip() if response.choices[0].message.content else ""
+    # Parse JSON response (guaranteed to be valid with structured output)
+    import json
+    content = response.choices[0].message.content
+    if content:
+        metadata = json.loads(content)
+        return {
+            "description": metadata.get("description", ""),
+            "category": metadata.get("category", "uncategorized"),
+            "filename": metadata.get("filename", "image")
+        }
+    
+    # Fallback (should rarely happen with structured output)
+    return {
+        "description": "",
+        "category": "uncategorized", 
+        "filename": "image"
+    }
 
 
 def generate_embedding(text: str) -> List[float]:
@@ -95,11 +117,12 @@ def process_single_image(image_path: Path) -> Dict[str, Any]:
     # Extract metadata
     metadata = extract_file_metadata(image_path)
     
-    # Generate AI description
-    description = generate_image_description(image_path)
+    # Generate AI metadata (description, category, filename)
+    ai_metadata = generate_image_metadata(image_path)
+    metadata.update(ai_metadata)
     
     # Create searchable text (description + filename)
-    searchable_text = f"{description} {image_path.name}"
+    searchable_text = f"{ai_metadata['description']} {image_path.name}"
     
     # Generate embedding
     embedding = generate_embedding(searchable_text)
@@ -107,7 +130,7 @@ def process_single_image(image_path: Path) -> Dict[str, Any]:
     return {
         "file_hash": metadata["file_hash"],
         "embedding": embedding,
-        "description": description,
+        "description": ai_metadata["description"],
         "metadata": metadata
     }
 
@@ -164,7 +187,7 @@ def index_directory(directory: Path, dry_run: bool = False) -> Dict[str, Any]:
     
     # Update configuration if indexing was successful
     if processed > 0:
-        add_indexed_path(directory)
+        add_indexed_path(str(directory))
         update_last_reindex()
     
     return {

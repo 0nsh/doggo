@@ -12,6 +12,7 @@ from doggo.indexer import index_directory
 from doggo.database import get_index_stats
 from doggo.searcher import search_similar_images, get_top_result_preview
 from doggo.utils import open_in_native_previewer
+from doggo.organizer import organize_images
 
 
 console = Console()
@@ -258,6 +259,20 @@ def search(query, limit, preview, no_open):
             title="[bold red]Search Error[/bold red]",
             border_style="red"
         ))
+        raise click.Abort()
+
+
+@main.command()
+@click.argument("location", type=click.Path(exists=True, file_okay=False, path_type=Path))
+@click.option("--rename", is_flag=True, help="Rename files based on AI analysis")
+@click.option("--output", type=click.Path(file_okay=False, path_type=Path), help="Output directory for organized files")
+@click.option("--inplace", is_flag=True, help="Organize files in place (mutually exclusive with --output)")
+def organize(location, rename, output, inplace):
+    """Organize images in LOCATION into AI-generated categories."""
+    try:
+        organize_images(location, rename=rename, output=output, inplace=inplace)
+    except Exception as e:
+        console.print(Panel(f"[red]❌ Failed to organize images: {str(e)}[/red]", title="[bold red]Organize Error[/bold red]", border_style="red"))
         raise click.Abort()
 
 

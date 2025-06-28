@@ -20,6 +20,26 @@
             "stopOnEntry": false
         },
         {
+            "name": "Debug Doggo Organize",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/doggo/cli.py",
+            "args": [
+                "organize",
+                "./local/images",
+                "--output",
+                "./local/images/output",
+                "--rename"
+            ],
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}"
+            },
+            "justMyCode": false,
+            "stopOnEntry": false
+        },
+        {
             "name": "Debug Doggo Index (Real)",
             "type": "python",
             "request": "launch",
@@ -68,6 +88,7 @@
             },
             "justMyCode": false,
             "stopOnEntry": false
-        }
+        },
+        
     ]
 } 
